@@ -1,62 +1,209 @@
-# Nassau Candy — Product Line Profitability & Margin Performance Analysis
+# Nassau Candy — Product Line Profitability & Margin Analysis
 
-Streamlit dashboard built to the PRD (v1.0). Source data: `data/raw/nassau_candy_raw.csv`
-(10,194 order lines, Jan 2024 – Dec 2025).
+An interactive data analytics dashboard built with **Python, Pandas, Streamlit, and Plotly** to analyze product profitability, gross margins, pricing inefficiencies, and business performance using Nassau Candy sales data.
 
-## Run locally
+**🚀 Live Dashboard:** [View Nassau Candy Dashboard](https://wroxn94cuplmefqp37frkm.streamlit.app/)
+
+**💻 GitHub Repository:** [Arpita114/nassau](https://github.com/Arpita114/nassau)
+
+---
+
+## Project Overview
+
+This project transforms raw sales data into an interactive business intelligence dashboard. It helps explore product-level profitability, identify low-margin products, evaluate cost pressures, and understand revenue concentration across the portfolio.
+
+The dataset contains **10,194 order lines** covering January 2024 through December 2025.
+
+## Tech Stack
+
+- **Python** — application logic and data analysis
+- **Pandas & NumPy** — data cleaning, transformation, and calculations
+- **Streamlit** — interactive dashboard interface
+- **Plotly** — interactive data visualizations
+- **CSV** — source and processed datasets
+- **Git & GitHub** — version control and project hosting
+- **Streamlit Community Cloud** — deployment
+
+## Key Features
+
+- Interactive dashboard with global filters and navigation
+- Product-level sales, gross profit, and gross margin analysis
+- Profit-per-unit and revenue/profit contribution metrics
+- Product profitability quadrant analysis
+- Low-margin product identification and repricing recommendations
+- Cost renegotiation and discontinuation review flags
+- Product-level pricing inefficiency analysis
+- Pareto analysis of revenue and profit concentration
+- Factory and state-level analytical rollups
+- Data quality validation, audit flags, and cleaning logs
+- Export functionality for analytical outputs
+
+## Key Business Findings
+
+Based on the default settings and full date range:
+
+| Metric | Result |
+|---|---:|
+| Total Sales | $141,784 |
+| Gross Profit | $93,443 |
+| Gross Margin | 65.9% |
+| Profit per Unit | $2.42 |
+
+### Portfolio Insights
+
+- **Chocolate dominates the portfolio**, contributing 92.9% of revenue and 95.1% of gross profit.
+- **Sugar contributes approximately 0.3% of revenue**, indicating a highly concentrated product portfolio.
+- Five products account for approximately 80% of revenue and gross profit.
+- The top five products contribute approximately 95% of gross profit, highlighting dependency on a small number of products.
+
+### Pricing and Cost Recommendations
+
+**Products flagged for repricing** under the default 50% gross margin threshold:
+
+- Kazookles — 7.7% margin
+- Fun Dip — 40.0% margin
+- Nerds — 46.7% margin
+- SweeTARTS — 46.7% margin
+
+**Cost renegotiation candidate:**
+- Kazookles — cost represents approximately 92% of sales, with 371 units sold.
+
+**Products flagged for discontinuation review:**
+- Laffy Taffy
+- SweeTARTS
+- Nerds
+- Fun Dip
+
+These are analytical flags intended to support business review, not automatic decisions to change prices or discontinue products.
+
+## KPI Definitions
+
+- **Gross Margin %** = Gross Profit ÷ Sales × 100
+- **Profit per Unit** = Gross Profit ÷ Units Sold
+- **Revenue Contribution** = Product Sales ÷ Total Sales
+- **Profit Contribution** = Product Gross Profit ÷ Total Gross Profit
+- **Margin Volatility** = Standard deviation of monthly product gross margins
+- **Repricing Flag** = Gross margin below the selected threshold
+- **Cost Renegotiation Flag** = Cost-to-sales ratio of at least 60% and unit volume at or above the median product volume
+- **Discontinuation Review Flag** = Sales at or below the 25th percentile and either gross profit at or below the 25th percentile or margin below the selected threshold
+
+## Data Quality and Limitations
+
+The project includes validation rules and data quality flags. Important limitations should be considered when interpreting the dashboard:
+
+1. **Factory allocation:** The source data does not contain a factory column. Product sales are split equally across candidate factories based on the available mapping. Factory figures are estimates, not measured production or sales by plant.
+2. **Approximate factory coordinates:** Factory locations use approximate metropolitan coordinates and should be replaced with verified plant addresses for geographic analysis.
+3. **Ship-date anomalies:** The dataset contains implausible shipping lags of approximately 904–1,642 days. These are flagged and excluded from KPI calculations.
+4. **Product classification conflict:** Fizzy Lifting Drinks has an `OTH-` product ID but is labelled as Sugar. The supplied division label is retained and the conflict is logged.
+5. **Limited product count:** Only 15 products are present, so Pareto thresholds are relatively coarse.
+6. **Margin volatility:** Unit prices and unit costs are constant in this dataset, resulting in effectively zero monthly margin volatility. This metric therefore provides limited differentiation between products.
+7. **Postal code formatting:** Leading zeros were lost in the original export. US postal codes were padded to five digits for consistency.
+
+## Project Structure
+
+```text
+nassau/
+├── app.py
+├── requirements.txt
+├── README.md
+├── data/
+│   ├── raw/
+│   │   └── nassau_candy_raw.csv
+│   └── processed/
+│       └── nassau_candy_clean.csv
+├── docs/
+│   └── cleaning_log.md
+├── scripts/
+│   ├── audit.py
+│   └── build_clean.py
+└── src/
+    ├── __init__.py
+    ├── charts.py
+    ├── config.py
+    ├── data_loading.py
+    └── metrics.py
+```
+
+## Run Locally
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Arpita114/nassau.git
+cd nassau
+```
+
+### 2. Create and activate a virtual environment (optional but recommended)
+
+```bash
+python -m venv .venv
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+### 3. Install dependencies
+
 ```bash
 pip install -r requirements.txt
-python scripts/build_clean.py   # cleaning pipeline -> data/processed + docs/cleaning_log.md
-python scripts/audit.py         # independent KPI audit vs raw CSV
+```
+
+### 4. Build the cleaned dataset
+
+```bash
+python scripts/build_clean.py
+```
+
+This runs the cleaning pipeline and generates the processed dataset and cleaning log.
+
+### 5. Run the KPI audit
+
+```bash
+python scripts/audit.py
+```
+
+This independently recalculates headline KPIs from the raw CSV and checks data quality flags.
+
+### 6. Launch the dashboard
+
+```bash
 streamlit run app.py
 ```
 
-## Deploy (Streamlit Community Cloud)
-1. Push this folder to a GitHub repo (keep `data/raw/` so the app can load the bundled CSV).
-2. In share.streamlit.io, create an app: main file `app.py`, Python 3.11+.
-3. Requirements come from `requirements.txt`. The live URL is the deployed app's URL.
+Open the local URL displayed in the terminal.
 
-## Layout
-```
-app.py                 Streamlit entry point (sidebar nav, global controls, 4 modules, exports)
-src/config.py          Paths, factory reference data, default thresholds
-src/data_loading.py    Cleaning & validation pipeline (DQ-1..DQ-5 + audit flags), cleaning log
-src/metrics.py         KPIs, quadrants, risk flags, pricing inefficiency, Pareto, factory & state rollups
-src/charts.py          Plotly chart builders
-scripts/build_clean.py Writes cleaned CSV + cleaning log
-scripts/audit.py       Recomputes headline KPIs from raw data and checks flags
-docs/cleaning_log.md   Generated record of every cleaning step and row count
-```
+## Deployment
 
-## Key definitions
-- Gross Margin % = Gross Profit ÷ Sales · Profit per Unit = Gross Profit ÷ Units
-- Revenue / Profit Contribution = product share of total Sales / Gross Profit
-- Margin Volatility = std. dev. of monthly gross margin per product (blank if < 2 months)
-- Reprice: margin % < slider threshold (default 50%)
-- Cost renegotiation: Cost/Sales ≥ 60% AND units ≥ median product volume
-- Discontinuation review: product sales ≤ 25th percentile AND (gross profit ≤ 25th percentile OR margin < threshold)
+This application is deployed using **Streamlit Community Cloud**.
 
-## Assumptions and data caveats (read before using the numbers)
-1. **No factory column in the data.** The PRD's product→factory mapping is one-to-many, so each
-   product's sales are split equally across its candidate factories. Factory figures are allocations, not
-   measured plant output. Chocolate's two factories therefore show identical values.
-2. **Factory coordinates are approximate** metro-level points (`src/config.py`). Replace with exact
-   plant addresses.
-3. **Ship dates are implausible:** every row has a 904–1,642 day lag between order and ship date. The
-   field is flagged and excluded from all KPIs.
-4. **Fizzy Lifting Drinks** has an `OTH-` product ID but is labelled "Sugar". The labelled division is kept
-   and the conflict is logged.
-5. **Only 15 products** exist, so Pareto "80%" thresholds are coarse (5 of 15 products).
-6. **Margin volatility is effectively zero** for every product: unit price and unit cost are constant in
-   this dataset, so monthly margin never moves. The metric is implemented correctly but cannot discriminate
-   here.
-7. **Postal codes** lost leading zeros in the export; US codes were padded to 5 digits (449 rows).
+- Main file: `app.py`
+- Python runtime: Python 3.11
+- Dependencies: `requirements.txt`
+- Source data: `data/raw/nassau_candy_raw.csv`
 
-## Headline findings (default settings, full date range)
-- Portfolio: Sales $141,784 · Gross Profit $93,443 · Gross Margin 65.9% · Profit per unit $2.42
-- Chocolate = 92.9% of revenue and 95.1% of profit; Sugar is 0.3% of revenue.
-- Five products produce 80% of both revenue and profit; the top five hold 95% of gross profit (over-dependency).
-- Reprice (margin < 50%): Kazookles (7.7%), Fun Dip (40%), Nerds (46.7%), SweeTARTS (46.7%).
-- Cost renegotiation: Kazookles (cost is 92% of sales on 371 units).
-- Discontinuation review: Laffy Taffy, SweeTARTS, Nerds, Fun Dip (bottom-quartile sales and profit).
-- Pricing inefficiency: Fun Dip has unit cost within 11% of Nutty Crunch and Hair Toffee but a 31–38 pp lower margin.
+**Live application:** https://wroxn94cuplmefqp37frkm.streamlit.app/
+
+The raw dataset must remain available in the repository because the application uses it as a source for loading and analysis.
+
+## Future Improvements
+
+- Integrate verified factory-level data and coordinates.
+- Investigate anomalous order and shipping dates with the data owner.
+- Add time-varying prices and costs to make margin volatility more informative.
+- Add automated tests and continuous integration for data validation.
+- Improve product-level recommendations with additional business context.
+
+## Author
+
+**Arpita Gupta**
+
+- GitHub: [@Arpita114](https://github.com/Arpita114)
+- Project Repository: [Nassau Candy Analysis](https://github.com/Arpita114/nassau)
+- Live Demo: [Streamlit Dashboard](https://wroxn94cuplmefqp37frkm.streamlit.app/)
+
+---
+
+*This project demonstrates data cleaning, exploratory data analysis, KPI design, interactive visualization, data quality auditing, and deployment of a Python analytics application.*
