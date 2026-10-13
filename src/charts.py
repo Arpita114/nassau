@@ -37,18 +37,53 @@ def profit_contribution_bar(pt):
     return fig
 
 
+
 def pareto_chart(p: pd.DataFrame, value_col: str, title: str, threshold: float = 0.8):
     fig = go.Figure()
-    fig.add_bar(x=p["Product Name"], y=p[value_col], name=value_col, marker_color="#4C78A8")
-    fig.add_scatter(x=p["Product Name"], y=p["Cumulative Share"], name="Cumulative share",
-                    yaxis="y2", mode="lines+markers", line=dict(color="#E45756"))
-    fig.add_hline(y=threshold, yref="y2", line_dash="dash", annotation_text=f"{int(threshold*100)}%")
+
+    fig.add_bar(
+        x=p["Product Name"],
+        y=p[value_col],
+        name=value_col,
+        marker_color="#4C78A8"
+    )
+
+    fig.add_scatter(
+        x=p["Product Name"],
+        y=p["Cumulative Share"],
+        name="Cumulative share",
+        yaxis="y2",
+        mode="lines+markers",
+        line=dict(color="#E45756")
+    )
+
+    fig.add_hline(
+        y=threshold,
+        yref="y2",
+        line_dash="dash",
+        annotation_text=f"{int(threshold * 100)}%"
+    )
+
     fig.update_layout(
-        title=title, height=460, xaxis_tickangle=-40, margin=dict(l=10, r=10, t=60, b=120),
-        yaxis=dict(title=value_col), yaxis2=dict(title="Cumulative share", overlaying="y", side="right",
-                                                 range=[0, 1.05], tickformat=".0%"),
-        legend=dict(orientation="h", y=1.12))
+        title=title,
+        height=460,
+        xaxis_tickangle=-40,
+        margin=dict(l=10, r=10, t=60, b=120),
+        yaxis=dict(title=value_col),
+        yaxis2=dict(
+            title="Cumulative share",
+            overlaying="y",
+            side="right",
+            range=[0, 1],
+            tickmode="array",
+            tickvals=[0, 0.2, 0.4, 0.6, 0.8, 1.0],
+            tickformat=".0%"
+        ),
+        legend=dict(orientation="h", y=1.12)
+    )
+
     return fig
+
 
 
 def division_share_bar(div):
